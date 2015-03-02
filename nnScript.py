@@ -332,18 +332,28 @@ def nnObjFunction(params, *args):
     			,[0,0,0,0,0,0,0,1,0,0]    #7
     			,[0,0,0,0,0,0,0,0,1,0]    #8
     			,[0,0,0,0,0,0,0,0,0,1]);  #9 
+   
+    current_training_label = 999;
+    learning_rate = 1;
     			
     #end of target vector init
     
     for i in (0,5000):
+    
+    	current_training_label = training_label[i]; # what digit is the example??
+    	
         input_vectors_1 = np.zeros((n_input,n_hidden));
         input_vectors_2 = np.zeros((n_hidden,n_class));
         output_i = np.zeros(n_class);
-
+	
+	#for each input d and for each input m, 
+	#compute the product of the input path for the input vector of the hidden node m
         for d in (0,n_input):
             for m in (0,n_hidden):
                 input_vectors_1[d][m] = w1[d][m] * train_data[i][d];
 
+	#for each hidden node m, first loop every input d and sum the input vector values to find the net.
+	#then loop over each output node l and assign the net to each input vector for the output nodes.
         for m in (0,n_hidden):
             net_m = 0;
             for d in (0,n_input):
@@ -351,15 +361,20 @@ def nnObjFunction(params, *args):
             for l in (0,n_class):
                 input_vectors_2[m][l] = net_m;
 
+	#for each output l, sum up all of the input values in the vector and apply sigmoid to get the output for l
         for l in (0,n_class):
             net_l = 0;
             for m in (0,hidden):
                 net_l += input_vectors_2[m][l] * w2[m][l]; #SIGMOID THIS LINE
             output_i[l] = net_l; #SIGMOID THIS LINE
 
-	for 
-
-
+	
+	#for each weight path m,l update the weight based on the output
+	for m in (0,n_hidden):
+		for l in (0,n_class):
+			greek_squiggly_letter = o[l] - target_class[current_training_label][l];
+			zee_jay = input_vectors_2[m][l]
+			w2[m][l] = w2[m][l] - learning_rate * greek_squiggly_letter * zee_jay
 
     
     
