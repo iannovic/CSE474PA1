@@ -141,18 +141,18 @@ def preprocess():
     train_vstack_8 = np.vstack((train_vstack_7, train8))
     train_vstack_9 = np.vstack((train_vstack_8, train9))
 
-    #train_vstack_label_1 = np.vstack((train_label0, train_label1))
-    #train_vstack_label_2 = np.vstack((train_vstack_lable_1, train_label2))
-    #train_vstack_label_3 = np.vstack((train_vstack_lable_2, train_label3))
-    #train_vstack_label_4 = np.vstack((train_vstack_lable_3, train_label4))
-    #train_vstack_label_5 = np.vstack((train_vstack_lable_4, train_label5))
-    #train_vstack_label_6 = np.vstack((train_vstack_lable_5, train_label6))
-    #train_vstack_label_7 = np.vstack((train_vstack_lable_6, train_label7))
-    #train_vstack_label_8 = np.vstack((train_vstack_lable_7, train_label8))
-    #train_vstack_label_9 = np.vstack((train_vstack_lable_8, train_label9))
+    print train_label0
 
-    np.concatenate((train_label0, train_label1))
-    np.concatenate((train_label0, train_label2))
+    train_concat_1 = np.concatenate((train_label0, train_label1))
+    train_concat_2 = np.concatenate((train_concat_1, train_label2))
+    train_concat_3 = np.concatenate((train_concat_2, train_label3))
+    train_concat_4 = np.concatenate((train_concat_3, train_label4))
+    train_concat_5 = np.concatenate((train_concat_4, train_label5))
+    train_concat_6 = np.concatenate((train_concat_5, train_label6))
+    train_concat_7 = np.concatenate((train_concat_6, train_label7))
+    train_concat_8 = np.concatenate((train_concat_7, train_label8))
+    train_concat_9 = np.concatenate((train_concat_8, train_label9))
+
     np.concatenate((train_label0, train_label3))
     np.concatenate((train_label0, train_label4))
     np.concatenate((train_label0, train_label5))
@@ -167,7 +167,8 @@ def preprocess():
             train0[k][t] = np.double(train0[k][t])
             train0[k][t] = train0[k][t]/256
 
-    print train_vstack_9.shape[0];
+    print train_concat_9
+    print train_vstack_9.shape[0]
 
     #Get data for testing
     test0 = mat.get('test0')
