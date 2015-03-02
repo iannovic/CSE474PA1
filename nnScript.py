@@ -338,7 +338,6 @@ def nnObjFunction(params, *args):
     obj_val = 0  
     
     #Your code here
-    #
     
     #create target vector class to compare during back propogation
     
@@ -363,11 +362,15 @@ def nnObjFunction(params, *args):
         input_vectors_1 = np.zeros((n_input,n_hidden));
         input_vectors_2 = np.zeros((n_hidden,n_class));
         output_i = np.zeros(n_class);
-
+	
+	#for each input d and for each input m, 
+	#compute the product of the input path for the input vector of the hidden node m
         for d in (0,n_input):
             for m in (0,n_hidden):
                 input_vectors_1[d][m] = w1[d][m] * train_data[i][d];
 
+	#for each hidden node m, first loop every input d and sum the input vector values to find the net.
+	#then loop over each output node l and assign the net to each input vector for the output nodes.
         for m in (0,n_hidden):
             net_m = 0;
             for d in (0,n_input):
@@ -375,12 +378,12 @@ def nnObjFunction(params, *args):
             for l in (0,n_class):
                 input_vectors_2[m][l] = net_m;
 
+	#for each output l, sum up all of the input values in the vector and apply sigmoid to get the output for l
         for l in (0,n_class):
             net_l = 0;
             for m in (0,hidden):
                 net_l += input_vectors_2[m][l] * w2[m][l]; #SIGMOID THIS LINE
             output_i[l] = net_l; #SIGMOID THIS LINE
-
 
 	#for each weight path m,l update the weight based on the output
 	for m in (0,n_hidden):
@@ -389,7 +392,6 @@ def nnObjFunction(params, *args):
 			zee_jay = input_vectors_2[m][l]
 			w2[m][l] = w2[m][l] - learning_rate * greek_squiggly_letter * zee_jay
 
-    
     
     #Make sure you reshape the gradient matrices to a 1D array. for instance if your gradient matrices are grad_w1 and grad_w2
     #you would use code similar to the one below to create a flat array
