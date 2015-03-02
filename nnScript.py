@@ -153,13 +153,13 @@ def preprocess():
     train_concat_8 = np.concatenate((train_concat_7, train_label8))
     train_concat_9 = np.concatenate((train_concat_8, train_label9))
 
-    np.concatenate((train_label0, train_label3))
-    np.concatenate((train_label0, train_label4))
-    np.concatenate((train_label0, train_label5))
-    np.concatenate((train_label0, train_label6))
-    np.concatenate((train_label0, train_label7))
-    np.concatenate((train_label0, train_label8))
-    np.concatenate((train_label0, train_label9))
+    #np.concatenate((train_label0, train_label3))
+    #np.concatenate((train_label0, train_label4))
+    #np.concatenate((train_label0, train_label5))
+    #np.concatenate((train_label0, train_label6))
+    #np.concatenate((train_label0, train_label7))
+    #np.concatenate((train_label0, train_label8))
+    #np.concatenate((train_label0, train_label9))
 
     #Convert all to double and normailze so that it is between 0 and 1
     for k in range(train0.shape[0]):
@@ -231,42 +231,62 @@ def preprocess():
     for i in range(test9_size):
         test_label9[i] = 9
 
-    np.concatenate((test0, test1))
-    np.concatenate((test0, test2))
-    np.concatenate((test0, test3))
-    np.concatenate((test0, test4))
-    np.concatenate((test0, test5))
-    np.concatenate((test0, test6))
-    np.concatenate((test0, test7))
-    np.concatenate((test0, test8))
-    np.concatenate((test0, test9))
+    test_vstack_1 = np.vstack((test0, test1))
+    test_vstack_2 = np.vstack((test_vstack_1, test2))
+    test_vstack_3 = np.vstack((test_vstack_2, test3))
+    test_vstack_4 = np.vstack((test_vstack_3, test4))
+    test_vstack_5 = np.vstack((test_vstack_4, test5))
+    test_vstack_6 = np.vstack((test_vstack_5, test6))
+    test_vstack_7 = np.vstack((test_vstack_6, test7))
+    test_vstack_8 = np.vstack((test_vstack_7, test8))
+    test_vstack_9 = np.vstack((test_vstack_8, test9))
+
+    test_concat_1 = np.concatenate((test_label0, test_label1))
+    test_concat_2 = np.concatenate((test_concat_1, test_label2))
+    test_concat_3 = np.concatenate((test_concat_2, test_label3))
+    test_concat_4 = np.concatenate((test_concat_3, test_label4))
+    test_concat_5 = np.concatenate((test_concat_4, test_label5))
+    test_concat_6 = np.concatenate((test_concat_5, test_label6))
+    test_concat_7 = np.concatenate((test_concat_6, test_label7))
+    test_concat_8 = np.concatenate((test_concat_7, test_label8))
+    test_concat_9 = np.concatenate((test_concat_8, test_label9))
+
+    #np.concatenate((test0, test1))
+    #np.concatenate((test0, test2))
+    #np.concatenate((test0, test3))
+    #np.concatenate((test0, test4))
+    #np.concatenate((test0, test5))
+    #np.concatenate((test0, test6))
+    #np.concatenate((test0, test7))
+    #np.concatenate((test0, test8))
+    #np.concatenate((test0, test9))
     
-    np.concatenate((test_label0, test_label1))
-    np.concatenate((test_label0, test_label2))
-    np.concatenate((test_label0, test_label3))
-    np.concatenate((test_label0, test_label4))
-    np.concatenate((test_label0, test_label5))
-    np.concatenate((test_label0, test_label6))
-    np.concatenate((test_label0, test_label7))
-    np.concatenate((test_label0, test_label8))
-    np.concatenate((test_label0, test_label9))
+    #np.concatenate((test_label0, test_label1))
+    #np.concatenate((test_label0, test_label2))
+    #np.concatenate((test_label0, test_label3))
+    #np.concatenate((test_label0, test_label4))
+    #np.concatenate((test_label0, test_label5))
+    #np.concatenate((test_label0, test_label6))
+    #np.concatenate((test_label0, test_label7))
+    #np.concatenate((test_label0, test_label8))
+    #np.concatenate((test_label0, test_label9))
 
     #Convert all to double and normailze so that it is between 0 and 1
-    for k in range(test0.shape[0]):
+    for k in range(test_concat_9.shape[0]):
         for t in range(784):
-            test0[k][t] = np.double(test0[k][t])
-            test0[k][t] = test0[k][t]/256
+            test_vstack_9[k][t] = np.double(test_vstack_9[k][t])
+            test_vstack_9[k][t] = test_vstack_9[k][t]/255
 
     #Randomly select 10,000 for validation
 
-    a = range(train0.shape[0])
+    a = range(train_vstack_9.shape[0])
     aperm = np.random.permutation(a)
 
-    validation_data = train0[aperm[0:10000],:]
-    train_data = train0[aperm[10000:],:]
+    validation_data = train_vstack_9[aperm[0:10000],:]
+    train_data = train_vstack_9[aperm[10000:],:]
 
-    validation_label = train_label0[aperm[0:10000],:]
-    train_label = train_label0[aperm[10000:],:]
+    validation_label = train_concat_9[aperm[0:10000]]
+    train_label = train_concat_9[aperm[10000:]]
     
     return train_data, train_label, validation_data, validation_label, test_data, test_label
     
@@ -357,7 +377,6 @@ def nnObjFunction(params, *args):
                 net_l += input_vectors_2[m][l] * w2[m][l]; #SIGMOID THIS LINE
             output_i[l] = net_l; #SIGMOID THIS LINE
 
-	for 
 
 
 
