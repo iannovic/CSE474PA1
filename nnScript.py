@@ -378,7 +378,12 @@ def nnObjFunction(params, *args):
             output_i[l] = net_l; #SIGMOID THIS LINE
 
 
-
+	#for each weight path m,l update the weight based on the output
+	for m in (0,n_hidden):
+		for l in (0,n_class):
+			greek_squiggly_letter = o[l] - target_class[current_training_label][l];
+			zee_jay = input_vectors_2[m][l]
+			w2[m][l] = w2[m][l] - learning_rate * greek_squiggly_letter * zee_jay
 
     
     
