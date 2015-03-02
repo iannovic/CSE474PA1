@@ -331,8 +331,7 @@ def nnObjFunction(params, *args):
     			,[0,0,0,0,0,0,0,1,0,0]    #7
     			,[0,0,0,0,0,0,0,0,1,0]    #8
     			,[0,0,0,0,0,0,0,0,0,1]);  #9 
-    
-    
+    			
     #end of target vector init
     
     for i in (0,5000):
