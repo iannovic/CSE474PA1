@@ -352,10 +352,14 @@ def nnObjFunction(params, *args):
     			,[0,0,0,0,0,0,0,1,0,0]    #7
     			,[0,0,0,0,0,0,0,0,1,0]    #8
     			,[0,0,0,0,0,0,0,0,0,1]);  #9 
-    			
+  	current_training_label = 999;
+	learning_rate = 1;
+    		
     #end of target vector init
     
     for i in (0,5000):
+    	
+    	current_training_label = training_label[i]; # what digit is the example??
         input_vectors_1 = np.zeros((n_input,n_hidden));
         input_vectors_2 = np.zeros((n_hidden,n_class));
         output_i = np.zeros(n_class);
