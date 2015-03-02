@@ -320,6 +320,21 @@ def nnObjFunction(params, *args):
     #Your code here
     #
     
+    #create target vector class to compare during back propogation
+    
+    target_class = 	([1,0,0,0,0,0,0,0,0,0]    #0 target class
+    			,[0,1,0,0,0,0,0,0,0,0]    #1
+    			,[0,0,1,0,0,0,0,0,0,0]	  #2
+    			,[0,0,0,1,0,0,0,0,0,0]    #3
+    			,[0,0,0,0,1,0,0,0,0,0]    #4
+    			,[0,0,0,0,0,1,0,0,0,0]    #5
+    			,[0,0,0,0,0,0,1,0,0,0]    #6
+    			,[0,0,0,0,0,0,0,1,0,0]    #7
+    			,[0,0,0,0,0,0,0,0,1,0]    #8
+    			,[0,0,0,0,0,0,0,0,0,1]);  #9 
+    			
+    #end of target vector init
+    
     for i in (0,5000):
         input_vectors_1 = np.zeros((n_input,n_hidden));
         input_vectors_2 = np.zeros((n_hidden,n_class));
@@ -342,7 +357,7 @@ def nnObjFunction(params, *args):
                 net_l += input_vectors_2[m][l] * w2[m][l]; #SIGMOID THIS LINE
             output_i[l] = net_l; #SIGMOID THIS LINE
 
-
+	for 
 
 
 
