@@ -2,6 +2,7 @@ import numpy as np
 from scipy.optimize import minimize
 from scipy.io import loadmat
 from math import sqrt
+from math import exp
 
 
 def initializeWeights(n_in,n_out):
@@ -26,8 +27,8 @@ def sigmoid(z):
     
     """# Notice that z can be a scalar, a vector or a matrix
     # return the sigmoid of input z"""
-    
-    return  #your code here
+
+    return  (1/(1 + exp(-z))) #your code here
     
     
 
@@ -284,6 +285,7 @@ def preprocess():
 
     validation_data = train_vstack_9[aperm[0:10000],:]
     train_data = train_vstack_9[aperm[10000:],:]
+    print len(train_data)
 
     validation_label = train_concat_9[aperm[0:10000]]
     train_label = train_concat_9[aperm[10000:]]
@@ -350,49 +352,73 @@ def nnObjFunction(params, *args):
     			,[0,0,0,0,0,0,1,0,0,0]    #6
     			,[0,0,0,0,0,0,0,1,0,0]    #7
     			,[0,0,0,0,0,0,0,0,1,0]    #8
-    			,[0,0,0,0,0,0,0,0,0,1]);  #9 
-  	current_training_label = 999;
-	learning_rate = 1;
+    			,[0,0,0,0,0,0,0,0,0,1])  #9 
+    
+    current_training_label = 999
+    learning_rate = 1
     		
     #end of target vector init
     
-    for i in (0,5000):
+    for i in range(5000):
     	
-    	current_training_label = training_label[i]; # what digit is the example??
-        input_vectors_1 = np.zeros((n_input,n_hidden));
-        input_vectors_2 = np.zeros((n_hidden,n_class));
-        output_i = np.zeros(n_class);
+    	current_training_label = training_label[i] # what digit is the example??
+        input_vectors_1 = np.zeros((n_input,n_hidden))
+        input_vectors_2 = np.zeros((n_hidden,n_class))
+        output_i = np.zeros(n_class)
 	
 	#for each input d and for each input m, 
 	#compute the product of the input path for the input vector of the hidden node m
-        for d in (0,n_input):
-            for m in (0,n_hidden):
-                input_vectors_1[d][m] = w1[d][m] * train_data[i][d];
+        for d in range(n_input):
+            for m in range(n_hidden):
+                #print "D" 
+                #print n_input
+                input_vectors_1[d][m] = w1[m][d] * train_data[i][d]
 
 	#for each hidden node m, first loop every input d and sum the input vector values to find the net.
 	#then loop over each output node l and assign the net to each input vector for the output nodes.
-        for m in (0,n_hidden):
-            net_m = 0;
-            for d in (0,n_input):
-                net_m += input_vectors_1[d][m];
-            for l in (0,n_class):
-                input_vectors_2[m][l] = net_m;
+        for m in range(n_hidden):
+            net_m = 0
+            #print "M"
+            for d in range(n_input):
+                net_m += input_vectors_1[d][m]
+            for l in range(n_class):
+                input_vectors_2[m][l] = net_m
 
 	#for each output l, sum up all of the input values in the vector and apply sigmoid to get the output for l
-        for l in (0,n_class):
-            net_l = 0;
-            for m in (0,hidden):
-                net_l += input_vectors_2[m][l] * w2[m][l]; #SIGMOID THIS LINE
-            output_i[l] = net_l; #SIGMOID THIS LINE
+        for l in range(n_class):
+            net_l = 0
+            #print "L"
+            for m in range(n_hidden):
+                net_l += sigmoid(input_vectors_2[m][l]) * w2[l][m] #SIGMOID THIS LINE
+            output_i[l] = sigmoid(net_l) #SIGMOID THIS LINE
 
-	#for each weight path m,l update the weight based on the output
-	for m in (0,n_hidden):
-		for l in (0,n_class):
-			greek_squiggly_letter = o[l] - target_class[current_training_label][l];
-			zee_jay = input_vectors_2[m][l]
-			w2[m][l] = w2[m][l] - learning_rate * greek_squiggly_letter * zee_jay
+        print "Forward"
+        print i
 
-    
+    	#for each weight path m,l update the weight based on the output
+    	for m in range(n_hidden):
+    		for l in range(n_class):
+    			greek_squiggly_letter = output_i[l] - target_class[int(current_training_label)][l]
+    			zee_jay = sigmoid(input_vectors_2[m][l]) #SIGMOID THIS LINE
+    			w2[l][m] = w2[l][m] - learning_rate * greek_squiggly_letter * zee_jay
+
+        print "Backward_1"
+
+        for d in range (n_input):
+            for m in range(n_hidden):
+                zee_jay = sigmoid(input_vectors_2[m][0])
+                some_summation = 0
+                
+                for l in range(n_class):
+                    greek_squiggly_letter = output_i[l] - target_class[int(current_training_label)][l]
+                    some_summation += greek_squiggly_letter * w2[l][m]
+                    
+                weight_update = (1 - zee_jay) * zee_jay * some_summation * train_data[i][d]
+            
+            w1[m][d] = w1[m][d] - learning_rate * weight_update
+
+        print "Backward_2"
+
     #Make sure you reshape the gradient matrices to a 1D array. for instance if your gradient matrices are grad_w1 and grad_w2
     #you would use code similar to the one below to create a flat array
     #obj_grad = np.concatenate((grad_w1.flatten(), grad_w2.flatten()),0)
