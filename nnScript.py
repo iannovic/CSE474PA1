@@ -332,8 +332,16 @@ def nnObjFunction(params, *args):
     learning_rate = 1
     		
     #end of target vector init
+	
+    gradiant_w1 = np.zeros((n_input,n_hidden))
+    gradiant_w2 = np.zeros((n_hidden,n_class))
 
-    num_i = 800
+    print("W1")
+    print(w1)
+    print("W2")
+    print(w2)
+
+    num_i = 100
     cumulative_jay = 0    
 
     for i in range(num_i):
@@ -362,20 +370,20 @@ def nnObjFunction(params, *args):
         for l in range(n_class):
             net_l = 0
             for m in range(n_hidden):
-                print("WEIGHT")
-                print(w2[l][m])
-                print("Input_vector")
-                print(input_vectors_2[m][l])
+                #print("WEIGHT")
+                #print(w2[l][m])
+                #print("Input_vector")
+                #print(input_vectors_2[m][l])
                 net_l += sigmoid(input_vectors_2[m][l]) * w2[l][m] #SIGMOID THIS LINE
-                print("NET_L")
-                print(sigmoid(net_l))
-                print("WEIGHT")
-                print(w2[l][m])
-                print("Input_vector")
-                print(input_vectors_2[m][l])
+                #print("NET_L")
+                #print(sigmoid(net_l))
+                #print("WEIGHT")
+                #print(w2[l][m])
+                #print("Input_vector")
+                #print(input_vectors_2[m][l])
             output_i[l] = sigmoid(net_l) #SIGMOID THIS LINE
 
-        print ("Forward")
+        #print ("Forward")
         print (i)
 
     	#for each weight path m,l update the weight based on the output
@@ -383,7 +391,9 @@ def nnObjFunction(params, *args):
                 for l in range(n_class):
                         greek_squiggly_letter = output_i[l] - target_class[int(current_training_label)][l]
                         zee_jay = sigmoid(input_vectors_2[m][l]) #SIGMOID THIS LINE
-                        w2[l][m] = w2[l][m] - learning_rate * greek_squiggly_letter * zee_jay
+                        gradient = greek_squiggly_letter * zee_jay + lambdaval * w2[l][m]
+                        gradiant_w2[m][l] += gradient
+                                                
 
         print ("Backward_1")
 
@@ -396,9 +406,14 @@ def nnObjFunction(params, *args):
                     greek_squiggly_letter = output_i[l] - target_class[int(current_training_label)][l]
                     some_summation += greek_squiggly_letter * w2[l][m]
                     
-                weight_update = (1 - zee_jay) * zee_jay * some_summation * train_data[i][d]
-            
-            w1[m][d] = w1[m][d] - learning_rate * weight_update
+                gradient = (1 - zee_jay) * zee_jay * some_summation * train_data[i][d]
+                print("zee_jay")
+                print(zee_jay)
+                print("some_summation")
+                print(some_summation)
+                print("train_data")
+                print(train_data[i][d])
+                gradiant_w1[d][m] += gradient
 
         print ("Backward_2")
         print (i)
@@ -429,12 +444,31 @@ def nnObjFunction(params, *args):
     obj_val = regularized_jay
     print(regularized_jay)
 
-    
+    for d in range(n_input):
+        for m in range(n_hidden):
+            weight_update =  gradiant_w1[d][m] / num_i
+            w1[m][d] = w1[m][d] - learning_rate * weight_update
+            #print("TEST")
+            #print(weight_update)
+            #print(gradiant_w1[d][m])
+
+    for m in range (n_hidden):
+        for l in range(n_class):
+            weight_update = gradiant_w2[m][l] / num_i
+            w2[l][m] = w2[l][m] - learning_rate * weight_update
+
+    print ("W1")
+    print (w1)
+    print ("W2")
+    print (w2)
+
+    obj_grad = np.concatenate((w1.flatten(), w2.flatten()),0)
+
 
     #Make sure you reshape the gradient matrices to a 1D array. for instance if your gradient matrices are grad_w1 and grad_w2
     #you would use code similar to the one below to create a flat array
     #obj_grad = np.concatenate((grad_w1.flatten(), grad_w2.flatten()),0)
-    obj_grad = np.array([])
+    #obj_grad = np.array([])
     
     return (obj_val,obj_grad)
 
