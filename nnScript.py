@@ -331,8 +331,11 @@ def nnObjFunction(params, *args):
     learning_rate = 1
     		
     #end of target vector init
-    
-    for i in range(5000):
+
+    num_i = 20
+    cumulative_jay = 0    
+
+    for i in range(num_i):
     	
         current_training_label = training_label[i] # what digit is the example??
         input_vectors_1 = np.zeros((n_input,n_hidden))
@@ -388,6 +391,31 @@ def nnObjFunction(params, *args):
 
         print ("Backward_2")
         print (i)
+	
+        temp_jay = 0
+        for l in range (n_class):
+            temp_jay += target_class[int(current_training_label)][l] * np.log(output_i[l] + 1 - target_class[int(current_training_label)][l]) * np.log(1 - output_i[l])
+
+        current_jay = -temp_jay
+        cumulative_jay += current_jay
+
+
+    final_jay = cumulative_jay * (1 / num_i)    
+    print(final_jay)
+
+    regularized_jay = 0
+    w1_summation = 0
+    w2_summation = 0
+    for m in range(n_hidden):
+        for d in range(n_input + 1):
+            w1_summation = w1_summation + w1[m][d] * w1[m][d]
+    
+    for l in range(n_class):
+        for m in range(n_hidden + 1):
+            w2_summation = w2_summation + w2[l][m] * w2[l][m]
+
+    regularized_jay = final_jay + (lambdaval / (2 * num_i)) * (w1_summation + w2_summation)
+    print(regularized_jay)
 
     #Make sure you reshape the gradient matrices to a 1D array. for instance if your gradient matrices are grad_w1 and grad_w2
     #you would use code similar to the one below to create a flat array
@@ -451,7 +479,7 @@ initial_w2 = initializeWeights(n_hidden, n_class);
 initialWeights = np.concatenate((initial_w1.flatten(), initial_w2.flatten()),0)
 
 # set the regularization hyper-parameter
-lambdaval = 0;
+lambdaval = .5; #CHANGED THIS
 
 
 args = (n_input, n_hidden, n_class, train_data, train_label, lambdaval)
