@@ -28,6 +28,7 @@ def sigmoid(z):
     """# Notice that z can be a scalar, a vector or a matrix
     # return the sigmoid of input z"""
 
+    #print(z)
     return  (1/(1 + exp(-z))) #your code here
     
     
@@ -332,7 +333,7 @@ def nnObjFunction(params, *args):
     		
     #end of target vector init
 
-    num_i = 20
+    num_i = 800
     cumulative_jay = 0    
 
     for i in range(num_i):
@@ -361,7 +362,17 @@ def nnObjFunction(params, *args):
         for l in range(n_class):
             net_l = 0
             for m in range(n_hidden):
+                print("WEIGHT")
+                print(w2[l][m])
+                print("Input_vector")
+                print(input_vectors_2[m][l])
                 net_l += sigmoid(input_vectors_2[m][l]) * w2[l][m] #SIGMOID THIS LINE
+                print("NET_L")
+                print(sigmoid(net_l))
+                print("WEIGHT")
+                print(w2[l][m])
+                print("Input_vector")
+                print(input_vectors_2[m][l])
             output_i[l] = sigmoid(net_l) #SIGMOID THIS LINE
 
         print ("Forward")
@@ -415,7 +426,10 @@ def nnObjFunction(params, *args):
             w2_summation = w2_summation + w2[l][m] * w2[l][m]
 
     regularized_jay = final_jay + (lambdaval / (2 * num_i)) * (w1_summation + w2_summation)
+    obj_val = regularized_jay
     print(regularized_jay)
+
+    
 
     #Make sure you reshape the gradient matrices to a 1D array. for instance if your gradient matrices are grad_w1 and grad_w2
     #you would use code similar to the one below to create a flat array
@@ -466,7 +480,7 @@ NUM_INPUT_NODES = 1;
 n_input = train_data.shape[NUM_INPUT_NODES]; 
 
 # set the number of nodes in hidden unit (not including bias unit)
-n_hidden = 50;
+n_hidden = 8;
 				   
 # set the number of nodes in output unit
 n_class = 10;				   
