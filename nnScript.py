@@ -142,7 +142,7 @@ def preprocess():
     train_vstack_8 = np.vstack((train_vstack_7, train8))
     train_vstack_9 = np.vstack((train_vstack_8, train9))
 
-    print train_label0
+    #print train_label0
 
     train_concat_1 = np.concatenate((train_label0, train_label1))
     train_concat_2 = np.concatenate((train_concat_1, train_label2))
@@ -154,13 +154,6 @@ def preprocess():
     train_concat_8 = np.concatenate((train_concat_7, train_label8))
     train_concat_9 = np.concatenate((train_concat_8, train_label9))
 
-    #np.concatenate((train_label0, train_label3))
-    #np.concatenate((train_label0, train_label4))
-    #np.concatenate((train_label0, train_label5))
-    #np.concatenate((train_label0, train_label6))
-    #np.concatenate((train_label0, train_label7))
-    #np.concatenate((train_label0, train_label8))
-    #np.concatenate((train_label0, train_label9))
 
     #Convert all to double and normailze so that it is between 0 and 1
     for k in range(train0.shape[0]):
@@ -168,8 +161,8 @@ def preprocess():
             train0[k][t] = np.double(train0[k][t])
             train0[k][t] = train0[k][t]/256
 
-    print train_concat_9
-    print train_vstack_9.shape[0]
+    #print train_concat_9
+    #print train_vstack_9.shape[0]
 
     #Get data for testing
     test0 = mat.get('test0')
@@ -252,26 +245,6 @@ def preprocess():
     test_concat_8 = np.concatenate((test_concat_7, test_label8))
     test_concat_9 = np.concatenate((test_concat_8, test_label9))
 
-    #np.concatenate((test0, test1))
-    #np.concatenate((test0, test2))
-    #np.concatenate((test0, test3))
-    #np.concatenate((test0, test4))
-    #np.concatenate((test0, test5))
-    #np.concatenate((test0, test6))
-    #np.concatenate((test0, test7))
-    #np.concatenate((test0, test8))
-    #np.concatenate((test0, test9))
-    
-    #np.concatenate((test_label0, test_label1))
-    #np.concatenate((test_label0, test_label2))
-    #np.concatenate((test_label0, test_label3))
-    #np.concatenate((test_label0, test_label4))
-    #np.concatenate((test_label0, test_label5))
-    #np.concatenate((test_label0, test_label6))
-    #np.concatenate((test_label0, test_label7))
-    #np.concatenate((test_label0, test_label8))
-    #np.concatenate((test_label0, test_label9))
-
     #Convert all to double and normailze so that it is between 0 and 1
     for k in range(test_concat_9.shape[0]):
         for t in range(784):
@@ -285,7 +258,7 @@ def preprocess():
 
     validation_data = train_vstack_9[aperm[0:10000],:]
     train_data = train_vstack_9[aperm[10000:],:]
-    print len(train_data)
+    #print len(train_data)
 
     validation_label = train_concat_9[aperm[0:10000]]
     train_label = train_concat_9[aperm[10000:]]
@@ -361,7 +334,7 @@ def nnObjFunction(params, *args):
     
     for i in range(5000):
     	
-    	current_training_label = training_label[i] # what digit is the example??
+        current_training_label = training_label[i] # what digit is the example??
         input_vectors_1 = np.zeros((n_input,n_hidden))
         input_vectors_2 = np.zeros((n_hidden,n_class))
         output_i = np.zeros(n_class)
@@ -370,15 +343,12 @@ def nnObjFunction(params, *args):
 	#compute the product of the input path for the input vector of the hidden node m
         for d in range(n_input):
             for m in range(n_hidden):
-                #print "D" 
-                #print n_input
                 input_vectors_1[d][m] = w1[m][d] * train_data[i][d]
 
 	#for each hidden node m, first loop every input d and sum the input vector values to find the net.
 	#then loop over each output node l and assign the net to each input vector for the output nodes.
         for m in range(n_hidden):
             net_m = 0
-            #print "M"
             for d in range(n_input):
                 net_m += input_vectors_1[d][m]
             for l in range(n_class):
@@ -387,22 +357,21 @@ def nnObjFunction(params, *args):
 	#for each output l, sum up all of the input values in the vector and apply sigmoid to get the output for l
         for l in range(n_class):
             net_l = 0
-            #print "L"
             for m in range(n_hidden):
                 net_l += sigmoid(input_vectors_2[m][l]) * w2[l][m] #SIGMOID THIS LINE
             output_i[l] = sigmoid(net_l) #SIGMOID THIS LINE
 
-        print "Forward"
-        print i
+        print ("Forward")
+        print (i)
 
     	#for each weight path m,l update the weight based on the output
-    	for m in range(n_hidden):
-    		for l in range(n_class):
-    			greek_squiggly_letter = output_i[l] - target_class[int(current_training_label)][l]
-    			zee_jay = sigmoid(input_vectors_2[m][l]) #SIGMOID THIS LINE
-    			w2[l][m] = w2[l][m] - learning_rate * greek_squiggly_letter * zee_jay
+        for m in range(n_hidden):
+                for l in range(n_class):
+                        greek_squiggly_letter = output_i[l] - target_class[int(current_training_label)][l]
+                        zee_jay = sigmoid(input_vectors_2[m][l]) #SIGMOID THIS LINE
+                        w2[l][m] = w2[l][m] - learning_rate * greek_squiggly_letter * zee_jay
 
-        print "Backward_1"
+        print ("Backward_1")
 
         for d in range (n_input):
             for m in range(n_hidden):
@@ -417,7 +386,8 @@ def nnObjFunction(params, *args):
             
             w1[m][d] = w1[m][d] - learning_rate * weight_update
 
-        print "Backward_2"
+        print ("Backward_2")
+        print (i)
 
     #Make sure you reshape the gradient matrices to a 1D array. for instance if your gradient matrices are grad_w1 and grad_w2
     #you would use code similar to the one below to create a flat array
