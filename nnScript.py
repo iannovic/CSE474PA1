@@ -3,6 +3,7 @@ from scipy.optimize import minimize
 from scipy.io import loadmat
 from math import sqrt
 from math import exp
+from decimal import Decimal
 
 
 def initializeWeights(n_in,n_out):
@@ -247,23 +248,47 @@ def preprocess():
     test_concat_9 = np.concatenate((test_concat_8, test_label9))
 
     #Convert all to double and normailze so that it is between 0 and 1
+    float_vals1 = np.zeros((train_concat_9.shape[0],784))
+    float_vals2 = np.zeros((test_concat_9.shape[0],784))
+
+    for k in range(train_concat_9.shape[0]):
+        for t in range(784):
+            float_vals1[k][t] = (train_vstack_9[k][t] + 0.0) / 256.0
+            #print("TRAIN")
+            #print(train_concat_9.shape[0])
+
+    print("First")
+    print(test_concat_9.shape[0])
     for k in range(test_concat_9.shape[0]):
         for t in range(784):
-            test_vstack_9[k][t] = np.double(test_vstack_9[k][t])
-            test_vstack_9[k][t] = test_vstack_9[k][t]/255
+            float_vals2[k][t] = (test_vstack_9[k][t] + 0.0) / 256.0
+            #print("TEST")
+            #print(test_concat_9.shape[0])
+    print("Second")
+            #print(test_vstack_9[k][t])
+            #test_vstack_9[k][t] = test_vstack_9[k][t] + 0.0
+            #test_vstack_9[k][t] = test_vstack_9[k][t]/256.0
+            #test = test_vstack_9[k][t]/256.0
+            #print(float_vals[k][t])
+            #print(test_vstack_9[k][t])
 
     #Randomly select 10,000 for validation
 
-    a = range(train_vstack_9.shape[0])
+    a = range(float_vals1.shape[0])
     aperm = np.random.permutation(a)
 
-    validation_data = train_vstack_9[aperm[0:10000],:]
-    train_data = train_vstack_9[aperm[10000:],:]
+    validation_data = float_vals1[aperm[0:10000],:]
+    train_data = float_vals1[aperm[10000:],:]
+    test_data = float_vals2
     #print len(train_data)
 
     validation_label = train_concat_9[aperm[0:10000]]
     train_label = train_concat_9[aperm[10000:]]
-    
+    #test_label = test_concat_9[aperm[10000:]]
+
+    #print("Train Data")
+    #print(train_data)    
+
     return train_data, train_label, validation_data, validation_label, test_data, test_label
     
     
@@ -333,13 +358,13 @@ def nnObjFunction(params, *args):
     		
     #end of target vector init
 	
-    gradiant_w1 = np.zeros((n_input,n_hidden))
-    gradiant_w2 = np.zeros((n_hidden,n_class))
+    gradiant_w1 = np.zeros((n_hidden,n_input+1))
+    gradiant_w2 = np.zeros((n_class,n_hidden+1))
 
-    print("W1")
-    print(w1)
-    print("W2")
-    print(w2)
+    #print("W1")
+    #print(w1)
+    #print("W2")
+    #print(w2)
 
     num_i = 100
     cumulative_jay = 0    
@@ -356,6 +381,9 @@ def nnObjFunction(params, *args):
         for d in range(n_input):
             for m in range(n_hidden):
                 input_vectors_1[d][m] = w1[m][d] * train_data[i][d]
+     
+        #input_vectors_1 = np.dot(w1, train_data[i])     
+        #print(input_vectors)
 
 	#for each hidden node m, first loop every input d and sum the input vector values to find the net.
 	#then loop over each output node l and assign the net to each input vector for the output nodes.
@@ -384,7 +412,7 @@ def nnObjFunction(params, *args):
             output_i[l] = sigmoid(net_l) #SIGMOID THIS LINE
 
         #print ("Forward")
-        print (i)
+        #print (i)
 
     	#for each weight path m,l update the weight based on the output
         for m in range(n_hidden):
@@ -392,10 +420,10 @@ def nnObjFunction(params, *args):
                         greek_squiggly_letter = output_i[l] - target_class[int(current_training_label)][l]
                         zee_jay = sigmoid(input_vectors_2[m][l]) #SIGMOID THIS LINE
                         gradient = greek_squiggly_letter * zee_jay + lambdaval * w2[l][m]
-                        gradiant_w2[m][l] += gradient
+                        gradiant_w2[l][m] += gradient
                                                 
 
-        print ("Backward_1")
+        #print ("Backward_1")
 
         for d in range (n_input):
             for m in range(n_hidden):
@@ -407,16 +435,16 @@ def nnObjFunction(params, *args):
                     some_summation += greek_squiggly_letter * w2[l][m]
                     
                 gradient = (1 - zee_jay) * zee_jay * some_summation * train_data[i][d]
-                print("zee_jay")
-                print(zee_jay)
-                print("some_summation")
-                print(some_summation)
-                print("train_data")
-                print(train_data[i][d])
-                gradiant_w1[d][m] += gradient
+                #print("zee_jay")
+                #print(zee_jay)
+                #print("some_summation")
+                #print(some_summation)
+                #print("train_data")
+                #print(train_data[i][d])
+                gradiant_w1[m][d] += gradient
 
-        print ("Backward_2")
-        print (i)
+        #print ("Backward_2")
+        #print (i)
 	
         temp_jay = 0
         for l in range (n_class):
@@ -446,23 +474,22 @@ def nnObjFunction(params, *args):
 
     for d in range(n_input):
         for m in range(n_hidden):
-            weight_update =  gradiant_w1[d][m] / num_i
-            w1[m][d] = w1[m][d] - learning_rate * weight_update
-            #print("TEST")
+            gradiant_w1[m][d] =  gradiant_w1[m][d] / num_i
+            #w1[m][d] = w1[m][d] - learning_rate * weight_update
             #print(weight_update)
             #print(gradiant_w1[d][m])
 
     for m in range (n_hidden):
         for l in range(n_class):
-            weight_update = gradiant_w2[m][l] / num_i
-            w2[l][m] = w2[l][m] - learning_rate * weight_update
+            gradiant_w2[l][m] = gradiant_w2[l][m] / num_i
+            #w2[l][m] = w2[l][m] - learning_rate * weight_update
 
-    print ("W1")
-    print (w1)
-    print ("W2")
-    print (w2)
+    #print ("W1")
+    #print (w1)
+    #print ("W2")
+    #print (w2)
 
-    obj_grad = np.concatenate((w1.flatten(), w2.flatten()),0)
+    obj_grad = np.concatenate((gradiant_w1.flatten(), gradiant_w2.flatten()),0)
 
 
     #Make sure you reshape the gradient matrices to a 1D array. for instance if your gradient matrices are grad_w1 and grad_w2
@@ -494,6 +521,66 @@ def nnPredict(w1,w2,data):
     
     labels = np.array([])
     #Your code here
+
+    num_i = data.shape[0]
+
+    for i in range(num_i):
+	
+        labels = np.zeros(data.shape[0])
+        #current_training_label = training_label[i] # what digit is the example??
+        input_vectors_1 = np.zeros((n_input,n_hidden))
+        input_vectors_2 = np.zeros((n_hidden,n_class))
+        output_i = np.zeros(n_class)
+
+        #for each input d and for each input m, 
+        #compute the product of the input path for the input vector of the hidden node m
+        for d in range(n_input):
+            for m in range(n_hidden):
+
+                input_vectors_1[d][m] = w1[m][d] * data[i][d]
+
+        #for each hidden node m, first loop every input d and sum the input vector values to find the net.
+        #then loop over each output node l and assign the net to each input vector for the output nodes.
+        for m in range(n_hidden):
+            net_m = 0
+            for d in range(n_input):
+                net_m += input_vectors_1[d][m]
+            for l in range(n_class):
+                input_vectors_2[m][l] = net_m
+
+        #for each output l, sum up all of the input values in the vector and apply sigmoid to get the output for l
+        for l in range(n_class):
+            net_l = 0
+            for m in range(n_hidden):
+                #print("WEIGHT")
+                #print(w2[l][m])
+                #print("Input_vector")
+                #print(input_vectors_2[m][l])
+                net_l += sigmoid(input_vectors_2[m][l]) * w2[l][m] #SIGMOID THIS LINE
+                #print("NET_L")
+                #print(sigmoid(net_l))
+                #print("WEIGHT")
+                #print(w2[l][m])
+                #print("Input_vector")
+                #print(input_vectors_2[m][l])
+            output_i[l] = sigmoid(net_l) #SIGMOID THIS LINE
+
+        top_l = 0
+        test = 0
+        for l in range(n_class):
+            if output_i[l] > top_l:
+                top_l = output_i[l]
+                #print("OUTPUT")
+                #print(l)
+                #print(output_i[l])
+                #print("END")
+                test = l
+
+        labels[i] = float(test)
+        #print ("Forward")
+        #print(labels[i])
+        #print (i)
+
     
     return labels
     
@@ -534,7 +621,7 @@ args = (n_input, n_hidden, n_class, train_data, train_label, lambdaval)
 
 #Train Neural Network using fmin_cg or minimize from scipy,optimize module. Check documentation for a working example
 
-opts = {'maxiter' : 50}    # Preferred value.
+opts = {'maxiter' : 2}    # Preferred value.
 
 nn_params = minimize(nnObjFunction, initialWeights, jac=True, args=args,method='CG', options=opts)
 
@@ -553,6 +640,10 @@ w2 = nn_params.x[(n_hidden * (n_input + 1)):].reshape((n_class, (n_hidden + 1)))
 predicted_label = nnPredict(w1,w2,train_data)
 
 #find the accuracy on Training Dataset
+print("PREDICT")
+print(predicted_label)
+for i in range(10):
+    print(train_label[i])
 
 print('\n Training set Accuracy:' + str(100*np.mean((predicted_label == train_label).astype(float))) + '%')
 
