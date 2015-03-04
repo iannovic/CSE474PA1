@@ -252,6 +252,7 @@ def preprocess():
     float_vals2 = np.zeros((test_concat_9.shape[0],784))
 
     for k in range(train_concat_9.shape[0]):
+    #for k in range(100):
         for t in range(784):
             float_vals1[k][t] = (train_vstack_9[k][t] + 0.0) / 256.0
             #print("TRAIN")
@@ -260,7 +261,7 @@ def preprocess():
     print("First")
     print(test_concat_9.shape[0])
     for k in range(test_concat_9.shape[0]):
-        for t in range(784):
+         for t in range(784):
             float_vals2[k][t] = (test_vstack_9[k][t] + 0.0) / 256.0
             #print("TEST")
             #print(test_concat_9.shape[0])
@@ -368,57 +369,45 @@ def nnObjFunction(params, *args):
 
     num_i = 100
     cumulative_jay = 0    
+  
+    print("NNOBJ")
 
     for i in range(num_i):
     	
         current_training_label = training_label[i] # what digit is the example??
-        input_vectors_1 = np.zeros((n_input,n_hidden))
-        input_vectors_2 = np.zeros((n_hidden,n_class))
         output_i = np.zeros(n_class)
-	
+
+
 	#for each input d and for each input m, 
 	#compute the product of the input path for the input vector of the hidden node m
-        for d in range(n_input):
-            for m in range(n_hidden):
-                input_vectors_1[d][m] = w1[m][d] * train_data[i][d]
-     
-        #input_vectors_1 = np.dot(w1, train_data[i])     
-        #print(input_vectors)
+
+        testAr = np.array([1])
+
+        test_train = np.concatenate((train_data[i], testAr))    
+ 
+        input_vectors_1 = np.dot(w1, test_train)     
 
 	#for each hidden node m, first loop every input d and sum the input vector values to find the net.
 	#then loop over each output node l and assign the net to each input vector for the output nodes.
-        for m in range(n_hidden):
-            net_m = 0
-            for d in range(n_input):
-                net_m += input_vectors_1[d][m]
-            for l in range(n_class):
-                input_vectors_2[m][l] = net_m
 
+        for m in range(input_vectors_1.shape[0]):
+            input_vectors_1[m] = sigmoid(input_vectors_1[m])
+
+        
+        test_train_2 = np.concatenate((input_vectors_1, testAr))
+        input_vectors_2 = np.dot(w2, test_train_2)
+        
+        
 	#for each output l, sum up all of the input values in the vector and apply sigmoid to get the output for l
         for l in range(n_class):
-            net_l = 0
-            for m in range(n_hidden):
-                #print("WEIGHT")
-                #print(w2[l][m])
-                #print("Input_vector")
-                #print(input_vectors_2[m][l])
-                net_l += sigmoid(input_vectors_2[m][l]) * w2[l][m] #SIGMOID THIS LINE
-                #print("NET_L")
-                #print(sigmoid(net_l))
-                #print("WEIGHT")
-                #print(w2[l][m])
-                #print("Input_vector")
-                #print(input_vectors_2[m][l])
-            output_i[l] = sigmoid(net_l) #SIGMOID THIS LINE
+             output_i[l] = sigmoid(input_vectors_2[l]) #SIGMOID THIS LINE
 
-        #print ("Forward")
-        #print (i)
 
     	#for each weight path m,l update the weight based on the output
         for m in range(n_hidden):
                 for l in range(n_class):
                         greek_squiggly_letter = output_i[l] - target_class[int(current_training_label)][l]
-                        zee_jay = sigmoid(input_vectors_2[m][l]) #SIGMOID THIS LINE
+                        zee_jay = input_vectors_1[m] #SIGMOID THIS LINE
                         gradient = greek_squiggly_letter * zee_jay + lambdaval * w2[l][m]
                         gradiant_w2[l][m] += gradient
                                                 
@@ -427,7 +416,7 @@ def nnObjFunction(params, *args):
 
         for d in range (n_input):
             for m in range(n_hidden):
-                zee_jay = sigmoid(input_vectors_2[m][0])
+                zee_jay = sigmoid(input_vectors_1[m])
                 some_summation = 0
                 
                 for l in range(n_class):
@@ -435,12 +424,6 @@ def nnObjFunction(params, *args):
                     some_summation += greek_squiggly_letter * w2[l][m]
                     
                 gradient = (1 - zee_jay) * zee_jay * some_summation * train_data[i][d]
-                #print("zee_jay")
-                #print(zee_jay)
-                #print("some_summation")
-                #print(some_summation)
-                #print("train_data")
-                #print(train_data[i][d])
                 gradiant_w1[m][d] += gradient
 
         #print ("Backward_2")
@@ -455,7 +438,7 @@ def nnObjFunction(params, *args):
 
 
     final_jay = cumulative_jay * (1 / num_i)    
-    print(final_jay)
+    #print(final_jay)
 
     regularized_jay = 0
     w1_summation = 0
@@ -475,14 +458,10 @@ def nnObjFunction(params, *args):
     for d in range(n_input):
         for m in range(n_hidden):
             gradiant_w1[m][d] =  gradiant_w1[m][d] / num_i
-            #w1[m][d] = w1[m][d] - learning_rate * weight_update
-            #print(weight_update)
-            #print(gradiant_w1[d][m])
 
     for m in range (n_hidden):
         for l in range(n_class):
             gradiant_w2[l][m] = gradiant_w2[l][m] / num_i
-            #w2[l][m] = w2[l][m] - learning_rate * weight_update
 
     #print ("W1")
     #print (w1)
@@ -519,51 +498,44 @@ def nnPredict(w1,w2,data):
     % Output: 
     % label: a column vector of predicted labels""" 
     
-    labels = np.array([])
+    #labels = np.array([])
     #Your code here
 
     num_i = data.shape[0]
+    labels = np.zeros(num_i)
+
+    print("PREDICT")
 
     for i in range(num_i):
-	
-        labels = np.zeros(data.shape[0])
+        
         #current_training_label = training_label[i] # what digit is the example??
-        input_vectors_1 = np.zeros((n_input,n_hidden))
-        input_vectors_2 = np.zeros((n_hidden,n_class))
         output_i = np.zeros(n_class)
 
-        #for each input d and for each input m, 
-        #compute the product of the input path for the input vector of the hidden node m
-        for d in range(n_input):
-            for m in range(n_hidden):
 
-                input_vectors_1[d][m] = w1[m][d] * data[i][d]
+    #for each input d and for each input m, 
+    #compute the product of the input path for the input vector of the hidden node m
 
-        #for each hidden node m, first loop every input d and sum the input vector values to find the net.
-        #then loop over each output node l and assign the net to each input vector for the output nodes.
-        for m in range(n_hidden):
-            net_m = 0
-            for d in range(n_input):
-                net_m += input_vectors_1[d][m]
-            for l in range(n_class):
-                input_vectors_2[m][l] = net_m
+        testAr = np.array([1])
 
-        #for each output l, sum up all of the input values in the vector and apply sigmoid to get the output for l
+        test_train = np.concatenate((train_data[i], testAr))    
+ 
+        input_vectors_1 = np.dot(w1, test_train)     
+
+    #for each hidden node m, first loop every input d and sum the input vector values to find the net.
+    #then loop over each output node l and assign the net to each input vector for the output nodes.
+
+        for m in range(input_vectors_1.shape[0]):
+            input_vectors_1[m] = sigmoid(input_vectors_1[m])
+
+        
+        test_train_2 = np.concatenate((input_vectors_1, testAr))
+        input_vectors_2 = np.dot(w2, test_train_2)
+        
+        
+    #for each output l, sum up all of the input values in the vector and apply sigmoid to get the output for l
         for l in range(n_class):
-            net_l = 0
-            for m in range(n_hidden):
-                #print("WEIGHT")
-                #print(w2[l][m])
-                #print("Input_vector")
-                #print(input_vectors_2[m][l])
-                net_l += sigmoid(input_vectors_2[m][l]) * w2[l][m] #SIGMOID THIS LINE
-                #print("NET_L")
-                #print(sigmoid(net_l))
-                #print("WEIGHT")
-                #print(w2[l][m])
-                #print("Input_vector")
-                #print(input_vectors_2[m][l])
-            output_i[l] = sigmoid(net_l) #SIGMOID THIS LINE
+             output_i[l] = sigmoid(input_vectors_2[l]) #SIGMOID THIS LINE
+
 
         top_l = 0
         test = 0
@@ -614,7 +586,7 @@ initial_w2 = initializeWeights(n_hidden, n_class);
 initialWeights = np.concatenate((initial_w1.flatten(), initial_w2.flatten()),0)
 
 # set the regularization hyper-parameter
-lambdaval = .5; #CHANGED THIS
+lambdaval = 0.0; #CHANGED THIS
 
 
 args = (n_input, n_hidden, n_class, train_data, train_label, lambdaval)
