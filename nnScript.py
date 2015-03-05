@@ -251,20 +251,27 @@ def preprocess():
     float_vals1 = np.zeros((train_concat_9.shape[0],784))
     float_vals2 = np.zeros((test_concat_9.shape[0],784))
 
-    for k in range(train_concat_9.shape[0]):
+    #for k in range(train_concat_9.shape[0]):
     #for k in range(100):
-        for t in range(784):
-            float_vals1[k][t] = (train_vstack_9[k][t] + 0.0) / 256.0
+    #    for t in range(784):
+    #        float_vals1[k][t] = (train_vstack_9[k][t] + 0.0) / 256.0
             #print("TRAIN")
             #print(train_concat_9.shape[0])
-
-    print("First")
-    print(test_concat_9.shape[0])
-    for k in range(test_concat_9.shape[0]):
-         for t in range(784):
-            float_vals2[k][t] = (test_vstack_9[k][t] + 0.0) / 256.0
+    
+    #testAr2 = np.array([1/256.0])
+    print(train_vstack_9)
+    float_vals1 = train_vstack_9/256.0
+    print(float_vals1)
+    #print("First")
+    #print(test_concat_9.shape[0])
+    #for k in range(test_concat_9.shape[0]):
+    #     for t in range(784):
+    #        float_vals2[k][t] = (test_vstack_9[k][t] + 0.0) / 256.0
             #print("TEST")
             #print(test_concat_9.shape[0])
+    print(test_vstack_9)
+    float_vals2 = test_vstack_9/256.0 
+    print(float_vals2)
     print("Second")
             #print(test_vstack_9[k][t])
             #test_vstack_9[k][t] = test_vstack_9[k][t] + 0.0
@@ -367,7 +374,7 @@ def nnObjFunction(params, *args):
     #print("W2")
     #print(w2)
 
-    num_i = 100
+    num_i = 200
     cumulative_jay = 0    
   
     print("NNOBJ")
@@ -416,7 +423,7 @@ def nnObjFunction(params, *args):
 
         for d in range (n_input):
             for m in range(n_hidden):
-                zee_jay = sigmoid(input_vectors_1[m])
+                zee_jay = input_vectors_1[m]
                 some_summation = 0
                 
                 for l in range(n_class):
@@ -431,7 +438,7 @@ def nnObjFunction(params, *args):
 	
         temp_jay = 0
         for l in range (n_class):
-            temp_jay += target_class[int(current_training_label)][l] * np.log(output_i[l] + 1 - target_class[int(current_training_label)][l]) * np.log(1 - output_i[l])
+            temp_jay += target_class[int(current_training_label)][l] * np.log(output_i[l]) + (1 - target_class[int(current_training_label)][l]) * np.log(1 - output_i[l])
 
         current_jay = -temp_jay
         cumulative_jay += current_jay
@@ -593,7 +600,7 @@ args = (n_input, n_hidden, n_class, train_data, train_label, lambdaval)
 
 #Train Neural Network using fmin_cg or minimize from scipy,optimize module. Check documentation for a working example
 
-opts = {'maxiter' : 2}    # Preferred value.
+opts = {'maxiter' : 3}    # Preferred value.
 
 nn_params = minimize(nnObjFunction, initialWeights, jac=True, args=args,method='CG', options=opts)
 
