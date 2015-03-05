@@ -247,20 +247,18 @@ def preprocess():
     float_vals1 = np.zeros((train_concat_9.shape[0],784))
     float_vals2 = np.zeros((test_concat_9.shape[0],784))
 
+    float_vals1 = train_vstack_9/256
 
-    float_vals1 = train_vstack_9/256.0
-
-    float_vals2 = test_vstack_9/256.0 
+    float_vals2 = test_vstack_9/256 
 
     print("Second")
-
 
     #Randomly select 10,000 for validation
 
     a = range(float_vals1.shape[0])
     aperm = np.random.permutation(a)
 
-    validation_data = float_vals1[aperm[10000],:]
+    validation_data = float_vals1[aperm[0:10000],:]
     train_data = float_vals1[aperm[10000:],:]
     test_data = float_vals2
     #print len(train_data)
@@ -268,6 +266,9 @@ def preprocess():
     validation_label = train_concat_9[aperm[0:10000]]
     train_label = train_concat_9[aperm[10000:]]
     #test_label = test_concat_9[aperm[10000:]]
+
+    for n in range(validation_data.shape[0]):
+        print(validation_label[n])
 
     #print("Train Data")
     #print(train_data)    
@@ -349,7 +350,7 @@ def nnObjFunction(params, *args):
     #print("W2")
     #print(w2)
 
-    num_i = 10
+    num_i = 5000
     cumulative_jay = 0    
   
     print("NNOBJ")
@@ -383,38 +384,86 @@ def nnObjFunction(params, *args):
         
 	#for each output l, sum up all of the input values in the vector and apply sigmoid to get the output for l
         for l in range(n_class):
-             output_i[l] = sigmoid(input_vectors_2[l]) #SIGMOID THIS LINE
+             output_i[l] = sigmoid(input_vectors_2[l]) - target_class[int(current_training_label)][l] #SIGMOID THIS LINE
 
 
     	#for each weight path m,l update the weight based on the output
-        for m in range(n_hidden):
-                for l in range(n_class):
-                        greek_squiggly_letter = output_i[l] - target_class[int(current_training_label)][l]
-                        zee_jay = input_vectors_1[m] #SIGMOID THIS LINE
-                        gradient = greek_squiggly_letter * zee_jay + lambdaval * w2[l][m]
-                        gradiant_w2[l][m] += gradient
+        #for m in range(n_hidden):
+                #for l in range(n_class):
+                        #greek_squiggly_letter = output_i[l]
+                        #zee_jay = input_vectors_1[m] #SIGMOID THIS LINE
+        
+
+        #print(output_i)
+        new_out = np.reshape(output_i,(output_i.shape[0],-1))
+        new_in = np.reshape(input_vectors_1,(-1,input_vectors_1.shape[0]))
+        #print(new_out)
+        #print(new_out.shape) 
+        #print(new_in.shape)
+        partial_j = np.dot(new_out, new_in)
+        testAr2 = np.zeros((n_class,1))
+        testAr2 = testAr2 + 1      
+        #print(testAr2.shape)
+        #print(partial_j.shape)
+
+        partial_j_2 = np.hstack((partial_j,testAr2)) 
+
+        #print(partial_j_2)
+        gradiant_w2 = partial_j_2 + lambdaval * w2 + gradiant_w2
+        #gradient = greek_squiggly_letter * zee_jay + lambdaval * w2[l][m]
+        #gradiant_w2[l][m] += gradient
                                                 
 
         #print ("Backward_1")
 
-        for d in range (n_input):
-           for m in range(n_hidden):
-                zee_jay = input_vectors_1[m]
-                some_summation = 0
+        #for d in range (n_input):
+        #   for m in range(n_hidden):
+        #        zee_jay = input_vectors_1[m]
+        #        some_summation = 0
                 
-                for l in range(n_class):
-                    greek_squiggly_letter = output_i[l] - target_class[int(current_training_label)][l]
-                    some_summation += greek_squiggly_letter * w2[l][m]
+        #        for l in range(n_class):
+        #            greek_squiggly_letter = sigmoid(input_vectors_2[l]) - target_class[int(current_training_label)][l]
+        #            some_summation += greek_squiggly_letter * w2[l][m]
                     
-                gradient = (1 - zee_jay) * zee_jay * some_summation * train_data[i][d]
-                gradiant_w1[m][d] += gradient
+        #        gradient = (1 - zee_jay) * zee_jay * some_summation * train_data[i][d]
+        #        gradiant_w1[m][d] += gradient
 
         #print ("Backward_2")
         #print (i)
 	
+        #print(w2.shape)
+        #print(output_i.shape)
+        output_i = np.reshape(output_i,(-1,output_i.shape[0]))
+        #print(output_i.shape)
+
+        l_m = np.dot(output_i,w2)
+        #print(input_vectors_1.shape)   
+        input_vectors_1_reshaped = np.reshape(input_vectors_1,(input_vectors_1.shape[0],-1))
+        testAr3 = np.zeros((1,1))
+        #print(input_vectors_1_reshaped.shape)
+        #print(testAr3.shape)
+        input_vectors_1_reshaped_2 = np.vstack((input_vectors_1_reshaped,testAr3))
+ 
+        #print(l_m.shape)
+        #print(input_vectors_1_reshaped_2.shape)
+        l_m_reshaped = np.reshape(l_m,(-1,l_m.shape[0]))
+        #print(l_m_reshaped.shape)
+        l_m_reshaped = l_m_reshaped * input_vectors_1_reshaped_2 * (1 - input_vectors_1_reshaped_2)
+        #print(l_m_reshaped.shape)
+        #print(train_data[i].shape)
+        train_data_i = train_data[i]        
+
+        train_data_reshaped = np.reshape(train_data_i,(-1,train_data_i.shape[0]))
+        #print(train_data_reshaped.shape)
+        l_m_reshaped_deleted = np.delete(l_m_reshaped,8,0)
+        train_data_reshaped_reshaped = np.hstack((train_data_reshaped,testAr3))
+        partial_w1 = np.dot(l_m_reshaped_deleted,train_data_reshaped_reshaped)
+        gradiant_w1 = gradiant_w1 + partial_w1 + lambdaval * w1
+        #print(gradiant_w1.shape) 
+
         temp_jay = 0
         for l in range (n_class):
-            temp_jay += target_class[int(current_training_label)][l] * np.log(output_i[l]) + (1 - target_class[int(current_training_label)][l]) * np.log(1 - output_i[l])
+            temp_jay += target_class[int(current_training_label)][l] * np.log(sigmoid(input_vectors_2[l])) + (1 - target_class[int(current_training_label)][l]) * np.log(1 - sigmoid(input_vectors_2[l]))
 
         current_jay = -temp_jay
         cumulative_jay += current_jay
@@ -566,7 +615,7 @@ args = (n_input, n_hidden, n_class, train_data, train_label, lambdaval)
 
 #Train Neural Network using fmin_cg or minimize from scipy,optimize module. Check documentation for a working example
 
-opts = {'maxiter' : 2}    # Preferred value.
+opts = {'maxiter' : 25}    # Preferred value.
 
 nn_params = minimize(nnObjFunction, initialWeights, jac=True, args=args,method='CG', options=opts)
 
