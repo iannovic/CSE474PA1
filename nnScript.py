@@ -8,7 +8,10 @@ from decimal import Decimal
 
 def initializeWeights(n_in,n_out):
     """
-    # initializeWeights return the random weights for Neural Network given the
+    # initializeWeights return the random weights EDICT")
+print(predicted_label)
+for i in range(10):
+    print(train_label[i])
     # number of node in the input layer and output layer
 
     # Input:
@@ -29,7 +32,9 @@ def sigmoid(z):
     """# Notice that z can be a scalar, a vector or a matrix
     # return the sigmoid of input z"""
 
-    #print(z)
+    #z = (1/(1+exp(z[, x])))
+
+    #return z
     return  (1/(1 + exp(-z))) #your code here
     
     
@@ -157,15 +162,6 @@ def preprocess():
     train_concat_9 = np.concatenate((train_concat_8, train_label9))
 
 
-    #Convert all to double and normailze so that it is between 0 and 1
-    #for k in range(train0.shape[0]):
-    #    for t in range(784):
-    #        train0[k][t] = np.double(train0[k][t])
-    #        train0[k][t] = train0[k][t]/256
-
-    #print train_concat_9
-    #print train_vstack_9.shape[0]
-
     #Get data for testing
     test0 = mat.get('test0')
     test0_size = test0.shape[0]
@@ -251,41 +247,20 @@ def preprocess():
     float_vals1 = np.zeros((train_concat_9.shape[0],784))
     float_vals2 = np.zeros((test_concat_9.shape[0],784))
 
-    #for k in range(train_concat_9.shape[0]):
-    #for k in range(100):
-    #    for t in range(784):
-    #        float_vals1[k][t] = (train_vstack_9[k][t] + 0.0) / 256.0
-            #print("TRAIN")
-            #print(train_concat_9.shape[0])
-    
-    #testAr2 = np.array([1/256.0])
-    #print(train_vstack_9)
+
     float_vals1 = train_vstack_9/256.0
-    #print(float_vals1)
-    #print("First")
-    #print(test_concat_9.shape[0])
-    #for k in range(test_concat_9.shape[0]):
-    #     for t in range(784):
-    #        float_vals2[k][t] = (test_vstack_9[k][t] + 0.0) / 256.0
-            #print("TEST")
-            #print(test_concat_9.shape[0])
-    #print(test_vstack_9)
+
     float_vals2 = test_vstack_9/256.0 
-    #print(float_vals2)
+
     print("Second")
-            #print(test_vstack_9[k][t])
-            #test_vstack_9[k][t] = test_vstack_9[k][t] + 0.0
-            #test_vstack_9[k][t] = test_vstack_9[k][t]/256.0
-            #test = test_vstack_9[k][t]/256.0
-            #print(float_vals[k][t])
-            #print(test_vstack_9[k][t])
+
 
     #Randomly select 10,000 for validation
 
     a = range(float_vals1.shape[0])
     aperm = np.random.permutation(a)
 
-    validation_data = float_vals1[aperm[0:10000],:]
+    validation_data = float_vals1[aperm[10000],:]
     train_data = float_vals1[aperm[10000:],:]
     test_data = float_vals2
     #print len(train_data)
@@ -374,7 +349,7 @@ def nnObjFunction(params, *args):
     #print("W2")
     #print(w2)
 
-    num_i = 200
+    num_i = 10
     cumulative_jay = 0    
   
     print("NNOBJ")
@@ -400,6 +375,7 @@ def nnObjFunction(params, *args):
         for m in range(input_vectors_1.shape[0]):
             input_vectors_1[m] = sigmoid(input_vectors_1[m])
 
+        #input_vectors_1 = sigmoid(input_vectors_1)
         
         test_train_2 = np.concatenate((input_vectors_1, testAr))
         input_vectors_2 = np.dot(w2, test_train_2)
@@ -462,14 +438,9 @@ def nnObjFunction(params, *args):
     obj_val = regularized_jay
     print(regularized_jay)
 
-   # for d in range(n_input):
-   #     for m in range(n_hidden):
-   #         gradiant_w1[m][d] =  gradiant_w1[m][d] / num_i
 
     gradiant_w1 = gradiant_w1/num_i
-   # for m in range (n_hidden):
-   #     for l in range(n_class):
-   #         gradiant_w2[l][m] = gradiant_w2[l][m] / num_i
+
     gradiant_w2 = gradiant_w2/num_i
 
 
@@ -552,17 +523,9 @@ def nnPredict(w1,w2,data):
         for l in range(n_class):
             if output_i[l] > top_l:
                 top_l = output_i[l]
-                #print("OUTPUT")
-                #print(l)
-                #print(output_i[l])
-                #print("END")
                 test = l
 
         labels[i] = float(test)
-        #print ("Forward")
-        #print(labels[i])
-        #print (i)
-
     
     return labels
     
@@ -603,7 +566,7 @@ args = (n_input, n_hidden, n_class, train_data, train_label, lambdaval)
 
 #Train Neural Network using fmin_cg or minimize from scipy,optimize module. Check documentation for a working example
 
-opts = {'maxiter' : 10}    # Preferred value.
+opts = {'maxiter' : 2}    # Preferred value.
 
 nn_params = minimize(nnObjFunction, initialWeights, jac=True, args=args,method='CG', options=opts)
 
@@ -622,16 +585,15 @@ w2 = nn_params.x[(n_hidden * (n_input + 1)):].reshape((n_class, (n_hidden + 1)))
 predicted_label = nnPredict(w1,w2,train_data)
 
 #find the accuracy on Training Dataset
-print("PREDICT")
-print(predicted_label)
-for i in range(10):
-    print(train_label[i])
+#print("PREDICT")
+#print(predicted_label)
+#for i in range(10):
+#    print(train_label[i]
 
 print('\n Training set Accuracy:' + str(100*np.mean((predicted_label == train_label).astype(float))) + '%')
 
 predicted_label = nnPredict(w1,w2,validation_data)
 
-#find the accuracy on Validation Dataset
 
 print('\n Validation set Accuracy:' + str(100*np.mean((predicted_label == validation_label).astype(float))) + '%')
 
