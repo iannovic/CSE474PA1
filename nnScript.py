@@ -158,10 +158,10 @@ def preprocess():
 
 
     #Convert all to double and normailze so that it is between 0 and 1
-    for k in range(train0.shape[0]):
-        for t in range(784):
-            train0[k][t] = np.double(train0[k][t])
-            train0[k][t] = train0[k][t]/256
+    #for k in range(train0.shape[0]):
+    #    for t in range(784):
+    #        train0[k][t] = np.double(train0[k][t])
+    #        train0[k][t] = train0[k][t]/256
 
     #print train_concat_9
     #print train_vstack_9.shape[0]
@@ -259,9 +259,9 @@ def preprocess():
             #print(train_concat_9.shape[0])
     
     #testAr2 = np.array([1/256.0])
-    print(train_vstack_9)
+    #print(train_vstack_9)
     float_vals1 = train_vstack_9/256.0
-    print(float_vals1)
+    #print(float_vals1)
     #print("First")
     #print(test_concat_9.shape[0])
     #for k in range(test_concat_9.shape[0]):
@@ -269,9 +269,9 @@ def preprocess():
     #        float_vals2[k][t] = (test_vstack_9[k][t] + 0.0) / 256.0
             #print("TEST")
             #print(test_concat_9.shape[0])
-    print(test_vstack_9)
+    #print(test_vstack_9)
     float_vals2 = test_vstack_9/256.0 
-    print(float_vals2)
+    #print(float_vals2)
     print("Second")
             #print(test_vstack_9[k][t])
             #test_vstack_9[k][t] = test_vstack_9[k][t] + 0.0
@@ -422,7 +422,7 @@ def nnObjFunction(params, *args):
         #print ("Backward_1")
 
         for d in range (n_input):
-            for m in range(n_hidden):
+           for m in range(n_hidden):
                 zee_jay = input_vectors_1[m]
                 some_summation = 0
                 
@@ -462,13 +462,16 @@ def nnObjFunction(params, *args):
     obj_val = regularized_jay
     print(regularized_jay)
 
-    for d in range(n_input):
-        for m in range(n_hidden):
-            gradiant_w1[m][d] =  gradiant_w1[m][d] / num_i
+   # for d in range(n_input):
+   #     for m in range(n_hidden):
+   #         gradiant_w1[m][d] =  gradiant_w1[m][d] / num_i
 
-    for m in range (n_hidden):
-        for l in range(n_class):
-            gradiant_w2[l][m] = gradiant_w2[l][m] / num_i
+    gradiant_w1 = gradiant_w1/num_i
+   # for m in range (n_hidden):
+   #     for l in range(n_class):
+   #         gradiant_w2[l][m] = gradiant_w2[l][m] / num_i
+    gradiant_w2 = gradiant_w2/num_i
+
 
     #print ("W1")
     #print (w1)
@@ -600,7 +603,7 @@ args = (n_input, n_hidden, n_class, train_data, train_label, lambdaval)
 
 #Train Neural Network using fmin_cg or minimize from scipy,optimize module. Check documentation for a working example
 
-opts = {'maxiter' : 3}    # Preferred value.
+opts = {'maxiter' : 10}    # Preferred value.
 
 nn_params = minimize(nnObjFunction, initialWeights, jac=True, args=args,method='CG', options=opts)
 
